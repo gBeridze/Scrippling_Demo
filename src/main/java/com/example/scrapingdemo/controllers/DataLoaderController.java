@@ -1,7 +1,7 @@
 package com.example.scrapingdemo.controllers;
 
 import com.example.scrapingdemo.repositories.WeatherRepository;
-import com.example.scrapingdemo.services.DataBaseFiller;
+import com.example.scrapingdemo.services.ForecastEntityCreator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -18,21 +16,17 @@ import java.util.List;
 public class DataLoaderController {
 
     WeatherRepository weatherRepository;
-    DataBaseFiller dataBaseFiller;
+    ForecastEntityCreator forecastEntityCreator;
 
-    public DataLoaderController(WeatherRepository weatherRepository, DataBaseFiller dataBaseFiller) {
+    public DataLoaderController(WeatherRepository weatherRepository, ForecastEntityCreator forecastEntityCreator) {
         this.weatherRepository = weatherRepository;
-        this.dataBaseFiller = dataBaseFiller;
+        this.forecastEntityCreator = forecastEntityCreator;
     }
 
     @GetMapping(path = "/w")
     public List getTemperatureBy(@RequestParam String city, @RequestParam String day) {
 
         DayOfWeek d = DayOfWeek.valueOf(day);
-
-
-
-
         return weatherRepository.findByDayAndCity(city , d);
     }
 
@@ -40,7 +34,9 @@ public class DataLoaderController {
     public void Load(){
 
         try{
-            dataBaseFiller.AddToDatabase();
+            forecastEntityCreator.createEntitySet();
+            weatherRepository.saveAll(forecastEntityCreator.getForecastsSet());
+
         }catch (Exception e){
             e.printStackTrace();
         }

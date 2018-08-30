@@ -13,12 +13,13 @@ import javax.annotation.PostConstruct;
 @Service
 public class DataRetrieverImp implements DataRetriever{
 
-
+    @Value("${json.url}")
+    String url;
 
     OkHttpClient httpClient = new OkHttpClient();
 
     @Override
-    public String getJsonAsString(String url) throws Exception
+    public String getJsonAsString() throws Exception
     {
         Request request = new Request.Builder()
                 .url(url)

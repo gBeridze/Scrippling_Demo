@@ -28,5 +28,13 @@ temperature - "temperatureMin"
 weatherState - "summary"
 day - DayOfWeek.of(i)
 
-
+user cxrili:
+username
+paroli
+mail
+dab.tar
+------------------
+login: security
+username pass;
+----------------
 

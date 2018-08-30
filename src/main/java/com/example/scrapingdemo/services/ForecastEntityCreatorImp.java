@@ -2,38 +2,39 @@ package com.example.scrapingdemo.services;
 
 import com.example.scrapingdemo.models.Forecast;
 import com.example.scrapingdemo.repositories.WeatherRepository;
-import com.google.gson.JsonArray;
 import com.jayway.jsonpath.JsonPath;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Service
-public class DataBaseFillerImp implements DataBaseFiller {
+public class ForecastEntityCreatorImp implements ForecastEntityCreator {
 
-    DataRetriever dataRetriever;
-    String city;
-    DayOfWeek dayOfWeek;
-    double temperature;
+    private DataRetriever dataRetriever;
+    private WeatherRepository weatherRepository;
+    private Set<Forecast> forecastsSet = new HashSet<>();
 
-    @Value("${json.url}")
-    String url;
-
-    WeatherRepository weatherRepository;
-
-    public DataBaseFillerImp(DataRetriever dataRetriever, WeatherRepository weatherRepository) {
+    public ForecastEntityCreatorImp(DataRetriever dataRetriever, WeatherRepository weatherRepository) {
         this.dataRetriever = dataRetriever;
         this.weatherRepository = weatherRepository;
     }
 
-    public void AddToDatabase()
+    public Set<Forecast> getForecastsSet() {
+        return forecastsSet;
+    }
+
+    public void setForecastsSet(Set<Forecast> forecastsSet) {
+        this.forecastsSet = forecastsSet;
+    }
+
+    public void createEntitySet()
     throws  Exception
     {
 
-        String json = dataRetriever.getJsonAsString(url);
+        String json = dataRetriever.getJsonAsString();
         //city
 
 
@@ -42,9 +43,9 @@ public class DataBaseFillerImp implements DataBaseFiller {
             String var = JsonPath.read(json ,"$.timezone");
             String[] vars = var.split("/");
 
-            city = vars[1];
-            forecast.setCity(city);
-            System.out.println(var);
+
+            forecast.setCity(vars[1]);
+            System.out.println(vars[1]);
 
 
             //summary
@@ -63,7 +64,9 @@ public class DataBaseFillerImp implements DataBaseFiller {
             Double d = JsonPath.read(json , "$.daily.data.[" +i+"].temperatureMin");
             System.out.println(d);
             forecast.setTemperature(d);
-            weatherRepository.save(forecast);
+
+            forecastsSet.add(forecast);
+
         }
 
 
